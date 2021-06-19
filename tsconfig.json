@@ -6,7 +6,7 @@
     "outDir": "build",
     "removeComments": true,
     "experimentalDecorators": true,
-    "target": "es6",
+    "target": "esNext",
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
