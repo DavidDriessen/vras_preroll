@@ -9,7 +9,27 @@ import fs from "fs";
 import cliProgress from "cli-progress";
 import ffmpeg from "fluent-ffmpeg";
 
-async function renderSession(session: EventClass, media: MediaClass[], args: { codec: string; nTrailers?: number } = { codec: 'libx264' }) {
+type RenderArgs = { codec: string; randomizeTrailers?: boolean; nTrailers?: number }
+
+function shuffle<T>(array: T[]) {
+  let currentIndex = array.length, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
+async function renderSession(session: EventClass, media: MediaClass[], args: RenderArgs) {
   const interlace = require('interlace-arrays')
   const currentMediaIds: string[] = session.media.map((m: { media: MediaClass }) => m.media.id)
   media = media.filter((m) => !currentMediaIds.includes(m.id))
@@ -26,7 +46,9 @@ async function renderSession(session: EventClass, media: MediaClass[], args: { c
     }, cliProgress.Presets.shades_grey)
 
     // @ts-ignore
-    const trailers = media.slice(0, args.nTrailers || 2).map((m) => new InputNode(m.trailer))
+    let trailers = media.slice(0, args.nTrailers || 10).map((m) => new InputNode(m.trailer))
+    if (args.randomizeTrailers)
+      trailers = shuffle(trailers)
     // Calculate number of frames to render based of trailer length
     const total = Math.ceil((await Promise.all(trailers.map((t) =>
       new Promise<number>((resolve1) => ffmpeg.ffprobe(t.file, (err, data) => {
@@ -77,6 +99,6 @@ async function renderSession(session: EventClass, media: MediaClass[], args: { c
       }))
     }
   ]).then(async (answers) => {
-    return renderSession(answers.session, await api.getMedia(), { codec: 'libx264' })
+    return renderSession(answers.session, await api.getMedia(), { codec: 'libx264', randomizeTrailers: true })
   })
 })()
