@@ -29,7 +29,7 @@ export default class Api {
 
   private static getMultiBar() {
     return new cliProgress.MultiBar({
-      clearOnComplete: false,
+      clearOnComplete: true,
       hideCursor: true,
       format: ' [{bar}] {percentage}% | ETA: {eta}s | {value}/{total} | {filename}',
       barsize: 100,
@@ -60,14 +60,14 @@ export default class Api {
 
   private async downloadImages(media: MediaClass[]) {
     const dir = './Posters';
-    media = media.filter((m) => !m.imageDownloaded(dir))
+    // media = media.filter((m) => !m.imageDownloaded(dir))
     if (media.length === 0) return
     console.log('Downloading images...')
     if (!fs.existsSync(dir)){
       fs.mkdirSync(dir);
     }
     const multiBar = Api.getMultiBar()
-    await Promise.all(media.map((m) => m.downloadImage(dir, multiBar)))
+    // await Promise.all(media.map((m) => m.downloadImage(dir, multiBar)))
     multiBar.stop()
   }
 
@@ -76,7 +76,7 @@ export default class Api {
     const media = events.flatMap<MediaClass>((event) => event.media.map((m: { media: MediaClass }) => m.media))
       .filter((v: MediaClass, i, a: MediaClass[])=>a.findIndex(t => t.id === v.id) === i)
     await this.downloadTrailers(media)
-    await this.downloadImages(media)
+    // await this.downloadImages(media)
     return media
   }
 }

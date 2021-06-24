@@ -1,0 +1,108 @@
+<html lang="en">
+  <head>
+    <style>
+      body {
+        width: 1920px;
+        height: 1080px;
+        color: white;
+        background: black;
+      }
+      p {
+        font-size: xx-large;
+      }
+      h1 {
+        font-size: 3rem;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 990px 900px;
+        grid-template-rows: 174px 400px 516px;
+        gap: 0 30px;
+        grid-auto-flow: column;
+        grid-template-areas:
+          "title session"
+          "posters showing"
+          "posters trailer";
+        width: 1920px;
+        height: 1080px;
+      }
+
+      .posters {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 0 0;
+        grid-auto-flow: column;
+        grid-template-areas:
+          ". . ."
+          ". . .";
+        grid-area: posters;
+      }
+
+      .showing {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr;
+        gap: 0 0;
+        grid-auto-flow: row;
+        grid-template-areas:
+          ". . .";
+        grid-area: showing;
+      }
+
+      .trailer { grid-area: trailer; }
+
+      .title { grid-area: title; }
+
+      .session { grid-area: session; }
+
+      .flex-container {
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-content: stretch;
+        align-items: center;
+      }
+
+      .poster {
+        order: 0;
+        flex: 0 1 auto;
+        align-self: auto;
+      }
+
+    </style>
+    <title>{{current.title}}</title>
+  </head>
+  <body>
+  <div class="container">
+    <div class="posters">
+      {{#each posters}}
+      <img src="{{this}}" height="460" width="330" alt="poster" />
+      {{/each}}
+    </div>
+    <div class="showing flex-container">
+      {{#if current.poster}}
+      <img src="{{current.poster}}" height="400" width="300" class="poster" alt="poster" />
+      {{else}}
+      {{#each current.posters}}
+      <img src="{{this}}" height="400" width="300" class="poster" alt="poster" />
+      {{/each}}
+      {{/if}}
+    </div>
+    <div class="trailer" style="background: aqua"></div>
+    <div class="title">
+      <h1 style="text-align: center">
+        Sign up at vranimesociety.com<br />
+        Currently showing the following & more
+      </h1>
+    </div>
+    <div class="session" style="position: relative">
+      <h1 style="position: absolute;bottom: 0">Session: {{current.title}}</h1>
+    </div>
+  </div>
+  </body>
+</html>

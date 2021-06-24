@@ -1,8 +1,7 @@
 import Parse from 'parse/node'
 import ytdl from 'ytdl-core'
 import fs from 'fs'
-import {MultiBar, SingleBar} from "cli-progress";
-import request from 'request'
+import {MultiBar} from "cli-progress";
 
 export enum MediaFormat {
   TV = 'TV',
@@ -133,7 +132,6 @@ export class MediaClass extends Parse.Object implements Media {
   }
 
   trailer?: string
-  image: string = ""
 
   trailerDownloaded(dir: string) {
     if (!this.trailer) {
@@ -163,34 +161,40 @@ export class MediaClass extends Parse.Object implements Media {
     })
   }
 
-  imageDownloaded(dir: string) {
-    if (!this.image) {
-      const filename = (this.get('image') as Parse.File).name()
-      this.image = dir + '/' + filename
-    }
-    return fs.existsSync(this.image)
+  get image(){
+    return this.get('image').url()
   }
 
-  downloadImage(dir: string, multiBar: MultiBar) {
-    if (!this.image)
-      throw Error('Please call imageDownloaded before downloadImage.')
-    let bar: SingleBar
-    return new Promise((resolve) => {
-      request((this.get('image') as Parse.File).url())
-        .on('response', (res) => {
-          bar = multiBar.create(parseInt(res.headers['content-length'] as string), 0)
-          bar.update({ filename: (this.get('image') as Parse.File).name() })
-          res.pipe(fs.createWriteStream(this.image))
-            .on('close', () => {
-              bar.update(bar.getTotal())
-              multiBar.remove(bar)
-              resolve(true)
-            })
-        })
-        .on('data', function (chunk) {
-          if (bar)
-            bar.increment(chunk.length)
-        })
-    })
-  }
+  // image: string = ""
+  //
+  // imageDownloaded(dir: string) {
+  //   if (!this.image) {
+  //     const filename = (this.get('image') as Parse.File).name()
+  //     this.image = dir + '/' + filename
+  //   }
+  //   return fs.existsSync(this.image)
+  // }
+  //
+  // downloadImage(dir: string, multiBar: MultiBar) {
+  //   if (!this.image)
+  //     throw Error('Please call imageDownloaded before downloadImage.')
+  //   let bar: SingleBar
+  //   return new Promise((resolve) => {
+  //     request((this.get('image') as Parse.File).url())
+  //       .on('response', (res) => {
+  //         bar = multiBar.create(parseInt(res.headers['content-length'] as string), 0)
+  //         bar.update({ filename: (this.get('image') as Parse.File).name() })
+  //         res.pipe(fs.createWriteStream(this.image))
+  //           .on('close', () => {
+  //             bar.update(bar.getTotal())
+  //             multiBar.remove(bar)
+  //             resolve(true)
+  //           })
+  //       })
+  //       .on('data', function (chunk) {
+  //         if (bar)
+  //           bar.increment(chunk.length)
+  //       })
+  //   })
+  // }
 }
