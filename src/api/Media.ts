@@ -143,6 +143,7 @@ export class MediaClass extends Parse.Object implements Media {
 
 
   downloadTrailer(dir: string, multiBar: MultiBar) {
+    if (!this.get('trailer')) return Promise.resolve()
     if (!this.trailer)
       throw Error('Please call trailerDownloaded before downloadTrailer.')
     const bar = multiBar.create(1, 0, { filename: this.get('title') + '.mp4'})
